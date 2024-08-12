@@ -47,10 +47,11 @@ spec:
           tierName: appstudio-env
         EOF
 
-        SPACEREQUEST_NAME=$(oc create -f space_request.yaml -o=jsonpath='{.metadata.name}' 2> error.txt)
+        #SPACEREQUEST_NAME=$(oc create -f space_request.yaml -o=jsonpath='{.metadata.name}')
+        REF=$(oc create -f space_request.yaml -o=jsonpath='{.metadata.ownerReferences}')
+        echo $REF
 
-        cat error.txt
-        oc get spacerequests -n $KONFLUXNAMESPACE
+        oc get spacerequests -n $KONFLUXNAMESPACE -o yaml
 
         if oc wait spacerequests $SPACEREQUEST_NAME --for=condition=Ready --timeout=5m -n $KONFLUXNAMESPACE; then
           secretRef=$(oc get spacerequests $SPACEREQUEST_NAME -o=jsonpath='{.status.namespaceAccess[0].secretRef}')
