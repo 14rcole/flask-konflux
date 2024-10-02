@@ -1,0 +1,38 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: deploy-container
+spec:
+  params:
+    - name: image-url
+      description: url of image onto which results will be attached
+  steps:
+    - name: echo
+      image: registry.redhat.io/openshift4/ose-cli:4.13@sha256:73df37794ffff7de1101016c23dc623e4990810390ebdabcbbfa065214352c7c
+      env:
+        - name: IMAGE_URL
+          value: $(params.image-url)
+      script: |
+        #!/usr/bin/env bash
+
+        cat '{"text": "this is a test of `oras attach` in the integration service"}' > test.json
+        UPLOAD_FILE=test.json
+        MEDIA_TYPE=application/json
+
+        if [ -z "${IMAGE_URL}" ] ]; then
+          echo 'No image-url param provided. Skipping upload.'
+          exit 0
+        fi
+
+        if [ ! -f "${UPLOAD_FILE}" ]; then
+          echo "No ${UPLOAD_FILE} exists. Skipping upload."
+          exit 0
+        fi
+
+        echo "Selecting auth"
+        select-oci-auth $IMAGE_URL >$HOME/auth.json
+        echo "Attaching to ${IMAGE_URL}"
+        oras attach --no-tty --registry-config "$HOME/auth.json" --artifact-type "${MEDIA_TYPE}" "${IMAGE_URL}" "${UPLOAD_FILE}:${MEDIA_TYPE}"
+        # oras attach --no-tty --registry-config "$HOME/auth.json" --distribution-spec v1.1-referrers-api --artifact-type "${MEDIA_TYPE}" "${IMAGE_URL}" "${UPLOAD_FILE}:${MEDIA_TYPE}"
+        # echo "Attaching to ${IMAGE_URL} via the OCI 1.1 Referrers Tag"
+        # oras attach --no-tty --registry-config "$HOME/auth.json" -distribution-spec v1.1-referrers-tag --artifact-type "${MEDIA_TYPE}" "${IMAGE_URL}" "${UPLOAD_FILE}:${MEDIA_TYPE}"
