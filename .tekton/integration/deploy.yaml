@@ -9,6 +9,9 @@ spec:
     - name: SNAPSHOT
       description: The JSON string of the Snapshot under test
     - name: pod-name
+  results:
+    - name: component-container-image
+      description: image url and tag
   steps:
     - name: echo
       image: registry.redhat.io/openshift4/ose-cli:4.13@sha256:73df37794ffff7de1101016c23dc623e4990810390ebdabcbbfa065214352c7c
@@ -33,6 +36,7 @@ spec:
 
         dnf install -y jq gettext
         export COMPONENT_CONTAINER_IMAGE=$(jq -r --arg component_name "${COMPONENT_NAME}" '.components[] | select(.name == $component_name) | .containerImage' <<< "${SNAPSHOT}")
+        echo -n "${COMPONENT_CONTAINER_IMAGE}" > $(results.component-container-image.path)
 
         echo "Echoing component container image"
 

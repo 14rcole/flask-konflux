@@ -91,7 +91,18 @@ spec:
           value: $(params.SNAPSHOT)
         - name: svc-name
           value: $(params.pod-and-svc-name)
-
-
-
-
+    - name: upload
+      runAfter:
+        - deploy-container
+      taskRef:
+        resolver: git
+        params:
+          - name: url
+            value: https://github.com/14rcole/flask-konflux.git
+          - name: revision
+            value: main
+          - name: pathInRepo
+            value: .tekton/integration/upload.yaml
+      params:
+        - name: image-url
+          value: $(tasks.deploy-container.results.component-container-image)
