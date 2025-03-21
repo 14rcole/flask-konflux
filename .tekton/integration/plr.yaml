@@ -1,0 +1,14 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  name: basic-test-pipelinerun
+spec:
+  pipelineRef:
+    resolver: git
+    params:
+      - name: url
+        value: https://github.com/14rcole/flask-konflux
+      - name: revision
+        value: main
+      - name: pathInRepo
+        value: .tekton/integration/basic-tests.yaml
