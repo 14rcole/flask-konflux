@@ -43,13 +43,11 @@ spec:
           - name: revision
             value: main
           - name: pathInRepo
-            value: task/provision-env-with-ephemeral-namespace/0.1/provision-env-with-ephemeral-namespace.yaml
+            value: task/eaas-provision-space/0.1/eaas-provision-space.yaml
       params:
-        - name: KONFLUXNAMESPACE
-          value: $(context.pipelineRun.namespace)
-        - name: PIPELINERUN_NAME
+        - name: ownerName
           value: $(context.pipelineRun.name)
-        - name: PIPELINERUN_UID
+        - name: ownerUid
           value: $(context.pipelineRun.uid)
     - name: deploy-container
       runAfter:
@@ -60,9 +58,10 @@ spec:
           - name: url
             value: https://github.com/14rcole/flask-konflux.git
           - name: revision
-            value: main
+            #value: main
+            value: organize-tekton-dir
           - name: pathInRepo
-            value: .tekton/integration/deploy.yaml
+            value: .tekton/integration/tasks/deploy.yaml
       params:
         - name: serviceaccount-secret
           value: $(tasks.provision-namespace.results.secretRef)
@@ -79,9 +78,10 @@ spec:
           - name: url
             value: https://github.com/14rcole/flask-konflux.git
           - name: revision
-            value: main
+            #value: main
+            value: organize-tekton-dir
           - name: pathInRepo
-            value: .tekton/integration/test.yaml
+            value: .tekton/integration/tasks/test.yaml
       params:
         - name: serviceaccount-secret
           value: $(tasks.provision-namespace.results.secretRef)
@@ -100,7 +100,7 @@ spec:
 #          - name: revision
 #            value: main
 #          - name: pathInRepo
-#            value: .tekton/integration/upload.yaml
+#            value: .tekton/integration/tasks/upload.yaml
 #      params:
 #        - name: image-url
 #          value: $(tasks.deploy-container.results.component-container-image)

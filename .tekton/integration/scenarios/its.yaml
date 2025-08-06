@@ -13,5 +13,5 @@ spec:
       - name: revision
         value: main
       - name: pathInRepo
-        #value: .tekton/integration/basic-tests.yaml
-        value: .tekton/integration/plr.yaml
+        value: .tekton/integration/pipelines/basic-tests.yaml
+        #value: .tekton/integration/pipelines/plr.yaml
